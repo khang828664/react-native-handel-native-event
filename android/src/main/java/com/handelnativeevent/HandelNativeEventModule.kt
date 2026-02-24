@@ -9,10 +9,6 @@ import com.facebook.react.bridge.UiThreadUtil
 class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   NativeHandelNativeEventSpec(reactContext) {
 
-  override fun multiply(a: Double, b: Double): Double {
-    return a * b
-  }
-
   override fun syncUIRender(promise: Promise) {
     // Luôn thực hiện logic UI trên UI Thread của Android
     UiThreadUtil.runOnUiThread {

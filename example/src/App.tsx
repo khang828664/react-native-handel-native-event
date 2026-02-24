@@ -7,12 +7,11 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import { multiply, syncUIRender } from 'react-native-handel-native-event';
+import { syncUIRender } from 'react-native-handel-native-event';
 
 export default function App() {
   const [isRendering, setIsRendering] = useState(false);
   const [renderLog, setRenderLog] = useState<string[]>([]);
-  const [multiplyResult] = useState(multiply(3, 7));
 
   useEffect(() => {
     // Demo: Tự động sync UI khi app mount
@@ -45,11 +44,6 @@ export default function App() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
-      <View style={styles.section}>
-        <Text style={styles.title}>🧮 Multiply Test</Text>
-        <Text style={styles.result}>multiply(3, 7) = {multiplyResult}</Text>
-      </View>
-
       <View style={styles.section}>
         <Text style={styles.title}>🎨 UI Render Sync Test</Text>
         <Text style={styles.description}>
