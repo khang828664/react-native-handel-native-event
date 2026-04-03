@@ -1,4 +1,5 @@
-// Mock cho native module HandelNativeEvent
+// Mock for native module HandelNativeEvent
+// This is overridden in individual test files if needed
 jest.mock('./src/NativeHandelNativeEvent', () => ({
   __esModule: true,
   default: {

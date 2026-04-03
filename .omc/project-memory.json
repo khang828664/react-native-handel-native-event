@@ -1,0 +1,251 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775199566854,
+  "projectRoot": "/Users/luukhang/Documents/KHANG/handel-native-event",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "jest",
+        "version": "29.7.0",
+        "category": "testing"
+      },
+      {
+        "name": "react",
+        "version": "19.2.0",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": null,
+    "scripts": {
+      "example": "yarn workspace react-native-handel-native-event-example",
+      "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+      "prepare": "bob build",
+      "typecheck": "tsc",
+      "lint": "eslint \"**/*.{js,ts,tsx}\"",
+      "test": "jest",
+      "release": "release-it --only-version"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": true,
+    "workspaces": [
+      "example"
+    ],
+    "mainDirectories": [
+      "lib",
+      "src"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "android": {
+      "path": "android",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775199566829,
+      "keyFiles": [
+        "build.gradle",
+        "local.properties"
+      ]
+    },
+    "example": {
+      "path": "example",
+      "purpose": null,
+      "fileCount": 11,
+      "lastAccessed": 1775199566829,
+      "keyFiles": [
+        "Gemfile",
+        "README.md",
+        "app.json",
+        "babel.config.js",
+        "index.js"
+      ]
+    },
+    "ios": {
+      "path": "ios",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775199566835,
+      "keyFiles": [
+        "HandelNativeEvent.h",
+        "HandelNativeEvent.mm"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 1,
+      "lastAccessed": 1775199566836,
+      "keyFiles": []
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 2,
+      "lastAccessed": 1775199566838,
+      "keyFiles": [
+        "NativeHandelNativeEvent.ts",
+        "index.tsx"
+      ]
+    },
+    "android/src": {
+      "path": "android/src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1775199566839,
+      "keyFiles": []
+    },
+    "src/__tests__": {
+      "path": "src/__tests__",
+      "purpose": "Test files",
+      "fileCount": 1,
+      "lastAccessed": 1775199566840,
+      "keyFiles": [
+        "index.test.tsx"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "",
+      "accessCount": 27,
+      "lastAccessed": 1775202983905,
+      "type": "directory"
+    },
+    {
+      "path": "ios/HandelNativeEvent.mm",
+      "accessCount": 8,
+      "lastAccessed": 1775202992683,
+      "type": "file"
+    },
+    {
+      "path": "android/src/main/java/com/handelnativeevent/HandelNativeEventModule.kt",
+      "accessCount": 8,
+      "lastAccessed": 1775202992806,
+      "type": "file"
+    },
+    {
+      "path": "src/index.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1775202724190,
+      "type": "file"
+    },
+    {
+      "path": "src/__tests__/index.test.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1775202724033,
+      "type": "file"
+    },
+    {
+      "path": "src/NativeHandelNativeEvent.ts",
+      "accessCount": 6,
+      "lastAccessed": 1775202979984,
+      "type": "file"
+    },
+    {
+      "path": "ios/HandelNativeEvent.h",
+      "accessCount": 6,
+      "lastAccessed": 1775202992324,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 5,
+      "lastAccessed": 1775202984134,
+      "type": "directory"
+    },
+    {
+      "path": "jest-setup.js",
+      "accessCount": 4,
+      "lastAccessed": 1775202724135,
+      "type": "file"
+    },
+    {
+      "path": "android/src/main/java/com/handelnativeevent/HandelNativeEventPackage.kt",
+      "accessCount": 4,
+      "lastAccessed": 1775202729236,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 4,
+      "lastAccessed": 1775202983279,
+      "type": "file"
+    },
+    {
+      "path": "tsconfig.json",
+      "accessCount": 3,
+      "lastAccessed": 1775202983216,
+      "type": "file"
+    },
+    {
+      "path": "HandelNativeEvent.podspec",
+      "accessCount": 2,
+      "lastAccessed": 1775201050125,
+      "type": "file"
+    },
+    {
+      "path": "android/src/main/AndroidManifest.xml",
+      "accessCount": 1,
+      "lastAccessed": 1775201050183,
+      "type": "file"
+    },
+    {
+      "path": "ios",
+      "accessCount": 1,
+      "lastAccessed": 1775201176105,
+      "type": "directory"
+    },
+    {
+      "path": "android",
+      "accessCount": 1,
+      "lastAccessed": 1775201176228,
+      "type": "directory"
+    },
+    {
+      "path": "example/android/app/debug.keystore",
+      "accessCount": 1,
+      "lastAccessed": 1775202988550,
+      "type": "file"
+    },
+    {
+      "path": "example/android/app",
+      "accessCount": 1,
+      "lastAccessed": 1775202988879,
+      "type": "directory"
+    }
+  ],
+  "userDirectives": []
+}
