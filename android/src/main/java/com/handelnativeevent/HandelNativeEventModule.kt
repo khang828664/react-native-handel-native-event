@@ -225,7 +225,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
     for (i in 0 until coreCount) {
       try {
         BufferedReader(FileReader("/sys/devices/system/cpu/cpu$i/cpufreq/cpuinfo_max_freq")).use { br ->
-          val freq = br.readLine()?.trim()?.toLongOrNull() ?: continue
+          val freq = br.readLine()?.trim()?.toLongOrNull() ?: return@use
           when {
             freq > maxFreq -> { maxFreq = freq; bigCores.clear(); bigCores.add(i) }
             freq == maxFreq -> bigCores.add(i)
