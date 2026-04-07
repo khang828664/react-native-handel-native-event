@@ -40,6 +40,19 @@ android {
   defaultConfig {
     minSdkVersion getExtOrDefault("minSdkVersion")
     targetSdkVersion getExtOrDefault("targetSdkVersion")
+    externalNativeBuild {
+      cmake {
+        cppFlags "-O3 -fno-rtti -fno-exceptions"
+        abiFilters "arm64-v8a", "x86_64"
+      }
+    }
+  }
+
+  externalNativeBuild {
+    cmake {
+      path "src/main/cpp/CMakeLists.txt"
+      version "3.22.1"
+    }
   }
 
   buildFeatures {

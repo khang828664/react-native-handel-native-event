@@ -143,32 +143,32 @@
   "hotPaths": [
     {
       "path": "",
-      "accessCount": 28,
-      "lastAccessed": 1775543590310,
+      "accessCount": 29,
+      "lastAccessed": 1775548972998,
       "type": "directory"
     },
     {
       "path": "android/src/main/java/com/handelnativeevent/HandelNativeEventModule.kt",
-      "accessCount": 11,
-      "lastAccessed": 1775543688428,
+      "accessCount": 14,
+      "lastAccessed": 1775547993515,
       "type": "file"
     },
     {
       "path": "ios/HandelNativeEvent.mm",
-      "accessCount": 10,
-      "lastAccessed": 1775543696418,
+      "accessCount": 11,
+      "lastAccessed": 1775548009841,
       "type": "file"
     },
     {
       "path": "src/index.tsx",
-      "accessCount": 9,
-      "lastAccessed": 1775543670631,
+      "accessCount": 10,
+      "lastAccessed": 1775548024314,
       "type": "file"
     },
     {
       "path": "src/NativeHandelNativeEvent.ts",
-      "accessCount": 8,
-      "lastAccessed": 1775543649927,
+      "accessCount": 9,
+      "lastAccessed": 1775547918393,
       "type": "file"
     },
     {
@@ -190,6 +190,12 @@
       "type": "directory"
     },
     {
+      "path": "package.json",
+      "accessCount": 5,
+      "lastAccessed": 1775548972262,
+      "type": "file"
+    },
+    {
       "path": "jest-setup.js",
       "accessCount": 4,
       "lastAccessed": 1775202724135,
@@ -202,12 +208,6 @@
       "type": "file"
     },
     {
-      "path": "package.json",
-      "accessCount": 4,
-      "lastAccessed": 1775202983279,
-      "type": "file"
-    },
-    {
       "path": "tsconfig.json",
       "accessCount": 3,
       "lastAccessed": 1775202983216,
@@ -217,6 +217,12 @@
       "path": "HandelNativeEvent.podspec",
       "accessCount": 2,
       "lastAccessed": 1775201050125,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 2,
+      "lastAccessed": 1775549106680,
       "type": "file"
     },
     {
@@ -248,6 +254,18 @@
       "accessCount": 1,
       "lastAccessed": 1775202988879,
       "type": "directory"
+    },
+    {
+      "path": "android/src/main/cpp/performance-boost.cpp",
+      "accessCount": 1,
+      "lastAccessed": 1775547936755,
+      "type": "file"
+    },
+    {
+      "path": "android/src/main/cpp/CMakeLists.txt",
+      "accessCount": 1,
+      "lastAccessed": 1775547939676,
+      "type": "file"
     }
   ],
   "userDirectives": []

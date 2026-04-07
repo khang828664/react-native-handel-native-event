@@ -100,6 +100,24 @@ RCT_EXPORT_MODULE()
     });
 }
 
+- (void)activateMaxPower:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject {
+    // iOS không cho phép set CPU affinity hay thread priority ở user space.
+    // Tắt idle timer để giữ màn hình sáng — tác dụng tương đương FLAG_KEEP_SCREEN_ON.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
+        resolve(@"Activated (iOS: idleTimerDisabled=YES)");
+    });
+}
+
+- (void)deactivateMaxPower:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIApplication sharedApplication].idleTimerDisabled = NO;
+        resolve(@(YES));
+    });
+}
+
 - (void)setSustainedPerformanceMode:(BOOL)enable
                             resolve:(RCTPromiseResolveBlock)resolve
                              reject:(RCTPromiseRejectBlock)reject {

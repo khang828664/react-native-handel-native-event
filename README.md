@@ -1,21 +1,30 @@
 # react-native-handel-native-event
 
-React Native TurboModule giúp đồng bộ UI rendering giữa Native và JavaScript thread. Thư viện này hỗ trợ React Native New Architecture (TurboModules) và hoạt động trên cả iOS và Android.
+React Native TurboModule cung cấp các API native để tối ưu hiệu năng UI và CPU, được thiết kế đặc biệt cho thiết bị **AC-powered** (POS, kiosk, màn hình checkout) — nơi cần hiệu năng ổn định, không bị CPU throttle.
 
 ## Tính năng
 
-- ✅ Đồng bộ UI render giữa Native và JS
-- ✅ Hỗ trợ React Native New Architecture (TurboModules)
-- ✅ Hoạt động trên iOS & Android
-- ✅ TypeScript support
-- ✅ Promise-based API
-- ✅ Zero dependencies
+- `syncUIRender` — Đồng bộ UI render cycle giữa Native và JS
+- `setKeepScreenOn` — Giữ màn hình luôn sáng
+- `setSustainedPerformanceMode` — Duy trì hiệu năng CPU/GPU ổn định (Android)
+- `activateMaxPower` — Kích hoạt toàn bộ tối ưu hiệu năng trong 1 lần gọi
+- `deactivateMaxPower` — Hoàn tác, khôi phục hành vi mặc định
+- Hỗ trợ New Architecture (TurboModules)
+- TypeScript support, Promise-based API
+- JNI C++ layer cho CPU Affinity (tự động phát hiện Big cores)
+
+---
 
 ## Yêu cầu
 
-- React Native >= 0.70.0
-- iOS >= 13.0
-- Android minSdkVersion >= 21
+| | Phiên bản tối thiểu |
+|---|---|
+| React Native | 0.73+ (New Architecture) |
+| Android API | 24+ (Android 7.0) |
+| iOS | 13.0+ |
+| NDK | r21+ (cho JNI layer) |
+
+---
 
 ## Cài đặt
 
@@ -35,180 +44,235 @@ cd ios && pod install
 
 ### Android
 
-Không cần cấu hình thêm, auto-linking sẽ xử lý.
+Không cần cấu hình thêm. CMake tự động biên dịch JNI layer khi build.
 
-## Sử dụng
-
-### Import
-
-```typescript
-import { syncUIRender } from 'react-native-handel-native-event';
-```
-
-### Sync UI Render
-
-Đồng bộ UI rendering - đợi cho đến khi native UI hoàn tất render/layout:
-
-```typescript
-// Sử dụng cơ bản
-async function handleAction() {
-  await syncUIRender();
-  console.log('UI đã render xong!');
-}
-
-// Use case thực tế: Đợi UI ổn định trước khi thực hiện action
-import { syncUIRender } from 'react-native-handel-native-event';
-
-const MyComponent = () => {
-  const handleComplexUpdate = async () => {
-    // 1. Update state/props
-    setLoading(true);
-
-    // 2. Đợi UI render xong
-    await syncUIRender();
-
-    // 3. Thực hiện action sau khi UI ổn định
-    performHeavyOperation();
-    setLoading(false);
-  };
-
-  return <Button onPress={handleComplexUpdate}>Complex Action</Button>;
-};
-```
-
-### Use Cases
-
-**1. Measurement sau khi render**
-
-```typescript
-const measureAfterRender = async () => {
-  // Trigger state update
-  setShowModal(true);
-
-  // Đợi UI render
-  await syncUIRender();
-
-  // Lấy measurements chính xác
-  modalRef.current?.measure((x, y, width, height) => {
-    console.log('Modal dimensions:', { width, height });
-  });
-};
-```
-
-**2. Animation sequence**
-
-```typescript
-const animateSequence = async () => {
-  // Start animation
-  Animated.timing(fadeAnim, {
-    /* ... */
-  }).start();
-
-  // Đợi frame tiếp theo
-  await syncUIRender();
-
-  // Start animation thứ 2
-  Animated.timing(slideAnim, {
-    /* ... */
-  }).start();
-};
-```
-
-**3. Screenshot/Capture**
-
-```typescript
-const captureScreen = async () => {
-  // Update UI
-  setOverlayVisible(false);
-
-  // Đợi UI update xong
-  await syncUIRender();
-
-  // Capture screenshot
-  const uri = await captureRef(viewRef);
-  return uri;
-};
-```
-
-**4. Testing & E2E**
-
-```typescript
-// Trong tests
-it('should display data after loading', async () => {
-  fetchData();
-
-  // Đợi UI render data
-  await syncUIRender();
-
-  expect(screen.getByText('Data loaded')).toBeTruthy();
-});
-```
+---
 
 ## API Reference
 
 ### `syncUIRender(): Promise<boolean>`
 
-Đồng bộ UI render - đợi cho đến khi native UI hoàn tất layout pass.
+Đợi cho đến khi UI render cycle hiện tại hoàn tất. Hữu ích trước khi chụp screenshot hoặc đo kích thước view.
 
-**Returns:** Promise resolve với `true` khi UI render xong
-
-**Throws:**
-
-- `NO_ACTIVITY` (Android): Activity không tồn tại
-- `NO_WINDOW` (iOS): Không tìm thấy key window
-- `UI_ERROR`: Lỗi khác trong quá trình render
-
-**Platform specifics:**
-
-- **iOS**: Sử dụng `CATransaction` để lắng nghe render completion
-- **Android**: Sử dụng `ViewTreeObserver.OnGlobalLayoutListener`
-
-## Testing
-
-Thư viện đã được cấu hình sẵn mock cho Jest/Bun:
+**Returns:** `true` khi render xong  
+**Throws:** `NO_ACTIVITY` (Android), `NO_WINDOW` (iOS), `UI_ERROR`  
+**Timeout:** 5 giây (tự resolve `true` nếu không có layout pass)
 
 ```typescript
-// Mock tự động hoạt động
 import { syncUIRender } from 'react-native-handel-native-event';
 
-test('should sync UI', async () => {
-  const result = await syncUIRender();
-  expect(result).toBe(true);
-});
+// Đợi UI ổn định trước khi chụp ảnh
+await syncUIRender();
+const uri = await captureRef(viewRef);
 ```
 
-Để custom mock:
+**Platform:**
+- Android: `ViewTreeObserver.OnGlobalLayoutListener`
+- iOS: `CATransaction` completion block
+
+---
+
+### `setKeepScreenOn(enable: boolean): Promise<boolean>`
+
+Giữ màn hình luôn sáng, ngăn thiết bị vào idle.
+
+```typescript
+import { setKeepScreenOn } from 'react-native-handel-native-event';
+
+await setKeepScreenOn(true);   // Màn hình không tắt
+await setKeepScreenOn(false);  // Khôi phục mặc định
+```
+
+**Platform:**
+- Android: `Window.FLAG_KEEP_SCREEN_ON`
+- iOS: `UIApplication.isIdleTimerDisabled`
+
+---
+
+### `setSustainedPerformanceMode(enable: boolean): Promise<boolean>`
+
+Yêu cầu Android duy trì hiệu năng CPU/GPU ổn định, tránh throttle nhiệt bất ngờ.
+
+```typescript
+import { setSustainedPerformanceMode } from 'react-native-handel-native-event';
+
+await setSustainedPerformanceMode(true);
+await setSustainedPerformanceMode(false);
+```
+
+**Lưu ý quan trọng:**
+- Chỉ có hiệu lực khi thiết bị **đang cắm điện AC**
+- Yêu cầu Android API 24+. Tự động resolve `false` nếu API < 24
+- iOS luôn resolve `false` (không có API tương đương)
+
+---
+
+### `activateMaxPower(): Promise<string>`
+
+Kích hoạt toàn bộ tối ưu hiệu năng trong một lần gọi, gộp 3 bước:
+
+1. Nâng **Thread Priority** lên `THREAD_PRIORITY_URGENT_DISPLAY`
+2. **CPU Affinity** (JNI) — ghim thread vào Big cores (tự động phát hiện)
+3. Bật `FLAG_KEEP_SCREEN_ON` + `SUSTAINED_PERFORMANCE_MODE`
+
+**Returns:** Chuỗi mô tả kết quả
+
+```typescript
+import { activateMaxPower } from 'react-native-handel-native-event';
+
+const result = await activateMaxPower();
+// Android: "Activated on 4 big core(s): [4, 5, 6, 7]"
+// iOS:     "Activated (iOS: idleTimerDisabled=YES)"
+```
+
+---
+
+### `deactivateMaxPower(): Promise<boolean>`
+
+Hoàn tác toàn bộ thay đổi của `activateMaxPower()`.
+
+- Reset thread priority về mặc định
+- Bỏ CPU affinity (scheduler tự điều phối lại)
+- Xóa `FLAG_KEEP_SCREEN_ON` + tắt `SUSTAINED_PERFORMANCE_MODE`
+
+```typescript
+import { deactivateMaxPower } from 'react-native-handel-native-event';
+
+await deactivateMaxPower();
+```
+
+---
+
+## Ví dụ thực tế
+
+### Hook cho màn hình POS / Kiosk
+
+```typescript
+import { useEffect } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
+import {
+  activateMaxPower,
+  deactivateMaxPower,
+} from 'react-native-handel-native-event';
+
+export function usePerformanceBoost() {
+  useEffect(() => {
+    activateMaxPower().catch(console.error);
+
+    const subscription = AppState.addEventListener(
+      'change',
+      (state: AppStateStatus) => {
+        if (state === 'active') {
+          activateMaxPower().catch(console.error);
+        } else {
+          deactivateMaxPower().catch(console.error);
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+      deactivateMaxPower().catch(console.error);
+    };
+  }, []);
+}
+```
+
+### Chụp màn hình / in hoá đơn
+
+```typescript
+import { syncUIRender } from 'react-native-handel-native-event';
+
+async function printReceipt() {
+  setOverlayVisible(false);
+
+  // Đảm bảo UI đã update xong trước khi capture
+  await syncUIRender();
+
+  const uri = await captureRef(receiptRef);
+  await PrinterSDK.print(uri);
+}
+```
+
+### Kết hợp đầy đủ cho màn hình Checkout
+
+```typescript
+import { useEffect } from 'react';
+import {
+  activateMaxPower,
+  deactivateMaxPower,
+  syncUIRender,
+} from 'react-native-handel-native-event';
+
+export function CheckoutScreen() {
+  useEffect(() => {
+    activateMaxPower();
+    return () => { deactivateMaxPower(); };
+  }, []);
+
+  async function handleConfirm() {
+    await syncUIRender();
+    // Xử lý thanh toán sau khi UI ổn định
+    await processPayment();
+  }
+}
+```
+
+### Mock trong Jest
 
 ```typescript
 jest.mock('react-native-handel-native-event', () => ({
   syncUIRender: jest.fn(() => Promise.resolve(true)),
+  setKeepScreenOn: jest.fn(() => Promise.resolve(true)),
+  setSustainedPerformanceMode: jest.fn(() => Promise.resolve(true)),
+  activateMaxPower: jest.fn(() =>
+    Promise.resolve('Activated on 4 big core(s): [4, 5, 6, 7]')
+  ),
+  deactivateMaxPower: jest.fn(() => Promise.resolve(true)),
 }));
 ```
 
-## Ví dụ
+---
 
-Xem [example app](example/src/App.tsx) để biết cách sử dụng đầy đủ.
+## Chi tiết kỹ thuật — CPU Affinity (Android)
 
-Chạy example:
+Module dùng JNI gọi `sched_setaffinity` từ C++ để ghim calling thread vào Big cores.
 
-```sh
-# iOS
-yarn example ios
+**Cơ chế phát hiện Big cores** — đọc `cpuinfo_max_freq`:
 
-# Android
-yarn example android
+```
+/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq  →  1804800  (Little core)
+/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq  →  2841600  (Big core)
+/sys/devices/system/cpu/cpu7/cpufreq/cpuinfo_max_freq  →  3187200  (Prime core) ← ghim vào đây
 ```
 
-## Contributing
+Các core có `cpuinfo_max_freq` cao nhất được chọn. Fallback về `[0]` nếu không đọc được file.
 
-- [Development workflow](CONTRIBUTING.md#development-workflow)
-- [Sending a pull request](CONTRIBUTING.md#sending-a-pull-request)
-- [Code of conduct](CODE_OF_CONDUCT.md)
+**Build flags:** `-O3 -fno-rtti -fno-exceptions`  
+**ABI:** `arm64-v8a`, `x86_64`
+
+---
+
+## Tích hợp Old Architecture
+
+Nếu dùng **Old Architecture**, đăng ký package thủ công trong `MainApplication`:
+
+```java
+import com.handelnativeevent.HandelNativeEventPackage;
+
+@Override
+protected List<ReactPackage> getPackages() {
+  return Arrays.asList(
+    new MainReactPackage(),
+    new HandelNativeEventPackage()
+  );
+}
+```
+
+**New Architecture (TurboModules)** — tự động qua codegen, không cần thêm.
+
+---
 
 ## License
 
 MIT
-
----
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)

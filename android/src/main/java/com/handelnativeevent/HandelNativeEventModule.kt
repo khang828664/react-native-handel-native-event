@@ -1,18 +1,27 @@
 package com.handelnativeevent
 
+import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
+import android.os.Process
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
+import java.io.BufferedReader
+import java.io.FileReader
 import java.util.concurrent.atomic.AtomicBoolean
 
 class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   NativeHandelNativeEventSpec(reactContext) {
+
+  // JNI — compiled từ performance-boost.cpp
+  private external fun nativeSetAffinity(coreIds: IntArray): Boolean
+  private external fun nativeResetAffinity(): Boolean
 
   private val pendingListeners = mutableListOf<PendingListener>()
 
@@ -138,8 +147,102 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  override fun activateMaxPower(promise: Promise) {
+    try {
+      // 1. Nâng thread priority lên mức cao nhất cho UI rendering
+      Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY)
+
+      // 2. Ghim thread vào Big cores (CPU Affinity qua JNI)
+      val bigCores = detectBigCores()
+      nativeSetAffinity(bigCores)
+
+      // 3. Window flags + Sustained Performance trên UI thread
+      UiThreadUtil.runOnUiThread {
+        try {
+          val activity = currentActivity
+          if (activity != null) {
+            val window = activity.window
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+              val pm = reactApplicationContext
+                .getSystemService(Context.POWER_SERVICE) as PowerManager
+              if (pm.isSustainedPerformanceModeSupported) {
+                window.setSustainedPerformanceMode(true)
+              }
+            }
+          }
+          promise.resolve("Activated on ${bigCores.size} big core(s): ${bigCores.toList()}")
+        } catch (e: Exception) {
+          promise.reject("BOOST_UI_ERR", e.message ?: "Unknown error")
+        }
+      }
+    } catch (e: Exception) {
+      promise.reject("BOOST_ERR", e.message ?: "Unknown error")
+    }
+  }
+
+  override fun deactivateMaxPower(promise: Promise) {
+    try {
+      // 1. Khôi phục thread priority về mức mặc định
+      Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT)
+
+      // 2. Bỏ CPU affinity — cho phép scheduler tự điều phối lại
+      nativeResetAffinity()
+
+      // 3. Tắt window flags trên UI thread
+      UiThreadUtil.runOnUiThread {
+        try {
+          val activity = currentActivity
+          if (activity != null) {
+            val window = activity.window
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+              window.setSustainedPerformanceMode(false)
+            }
+          }
+          promise.resolve(true)
+        } catch (e: Exception) {
+          promise.reject("DEACTIVATE_UI_ERR", e.message ?: "Unknown error")
+        }
+      }
+    } catch (e: Exception) {
+      promise.reject("DEACTIVATE_ERR", e.message ?: "Unknown error")
+    }
+  }
+
+  /**
+   * Quét /sys/devices/system/cpu/cpuN/cpufreq/cpuinfo_max_freq
+   * để tìm các core có xung nhịp tối đa cao nhất (Big cores).
+   * Fallback về [0] nếu không đọc được (thiếu quyền hoặc không tồn tại).
+   */
+  private fun detectBigCores(): IntArray {
+    val bigCores = mutableListOf<Int>()
+    var maxFreq = 0L
+    val coreCount = Runtime.getRuntime().availableProcessors()
+
+    for (i in 0 until coreCount) {
+      try {
+        BufferedReader(FileReader("/sys/devices/system/cpu/cpu$i/cpufreq/cpuinfo_max_freq")).use { br ->
+          val freq = br.readLine()?.trim()?.toLongOrNull() ?: continue
+          when {
+            freq > maxFreq -> { maxFreq = freq; bigCores.clear(); bigCores.add(i) }
+            freq == maxFreq -> bigCores.add(i)
+          }
+        }
+      } catch (_: Exception) { /* quyền bị từ chối hoặc file không tồn tại */ }
+    }
+
+    return if (bigCores.isEmpty()) intArrayOf(0) else bigCores.toIntArray()
+  }
+
   companion object {
     const val NAME = NativeHandelNativeEventSpec.NAME
     private const val TIMEOUT_MS = 5000L
+
+    init {
+      System.loadLibrary("performance-boost")
+    }
   }
 }
