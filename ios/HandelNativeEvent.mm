@@ -100,6 +100,27 @@ RCT_EXPORT_MODULE()
     });
 }
 
+- (void)setSustainedPerformanceMode:(BOOL)enable
+                            resolve:(RCTPromiseResolveBlock)resolve
+                             reject:(RCTPromiseRejectBlock)reject {
+    // iOS không có API tương đương SUSTAINED_PERFORMANCE_MODE của Android.
+    // Resolve false để caller biết tính năng không khả dụng.
+    resolve(@(NO));
+}
+
+- (void)setKeepScreenOn:(BOOL)enable
+                resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @try {
+            [UIApplication sharedApplication].idleTimerDisabled = enable;
+            resolve(@(YES));
+        } @catch (NSException *exception) {
+            reject(@"SCREEN_ERROR", exception.reason, nil);
+        }
+    });
+}
+
 - (void)invalidate {
     @synchronized (self) {
         for (dispatch_block_t block in self.pendingBlocks) {

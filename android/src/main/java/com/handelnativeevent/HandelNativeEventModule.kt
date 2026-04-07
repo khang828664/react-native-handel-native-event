@@ -1,9 +1,11 @@
 package com.handelnativeevent
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
@@ -93,6 +95,47 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
       pendingListeners.clear()
     }
     super.invalidate()
+  }
+
+  override fun setSustainedPerformanceMode(enable: Boolean, promise: Promise) {
+    UiThreadUtil.runOnUiThread {
+      try {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+          // API < 24: không hỗ trợ
+          promise.resolve(false)
+          return@runOnUiThread
+        }
+        val activity = currentActivity
+        if (activity == null) {
+          promise.reject("NO_ACTIVITY", "Activity does not exist")
+          return@runOnUiThread
+        }
+        activity.window.setSustainedPerformanceMode(enable)
+        promise.resolve(true)
+      } catch (e: Exception) {
+        promise.reject("PERF_ERROR", e.message ?: "Unknown error")
+      }
+    }
+  }
+
+  override fun setKeepScreenOn(enable: Boolean, promise: Promise) {
+    UiThreadUtil.runOnUiThread {
+      try {
+        val activity = currentActivity
+        if (activity == null) {
+          promise.reject("NO_ACTIVITY", "Activity does not exist")
+          return@runOnUiThread
+        }
+        if (enable) {
+          activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+          activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        promise.resolve(true)
+      } catch (e: Exception) {
+        promise.reject("SCREEN_ERROR", e.message ?: "Unknown error")
+      }
+    }
   }
 
   companion object {

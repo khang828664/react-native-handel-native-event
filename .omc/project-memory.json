@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1775199566854,
+  "lastScanned": 1775543262678,
   "projectRoot": "/Users/luukhang/Documents/KHANG/handel-native-event",
   "techStack": {
     "languages": [
@@ -66,7 +66,10 @@
       "lib",
       "src"
     ],
-    "gitBranches": null
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
   },
   "customNotes": [],
   "directoryMap": {
@@ -74,7 +77,7 @@
       "path": "android",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1775199566829,
+      "lastAccessed": 1775543262646,
       "keyFiles": [
         "build.gradle",
         "local.properties"
@@ -84,7 +87,7 @@
       "path": "example",
       "purpose": null,
       "fileCount": 11,
-      "lastAccessed": 1775199566829,
+      "lastAccessed": 1775543262647,
       "keyFiles": [
         "Gemfile",
         "README.md",
@@ -97,7 +100,7 @@
       "path": "ios",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1775199566835,
+      "lastAccessed": 1775543262654,
       "keyFiles": [
         "HandelNativeEvent.h",
         "HandelNativeEvent.mm"
@@ -107,14 +110,14 @@
       "path": "lib",
       "purpose": "Library code",
       "fileCount": 1,
-      "lastAccessed": 1775199566836,
+      "lastAccessed": 1775543262655,
       "keyFiles": []
     },
     "src": {
       "path": "src",
       "purpose": "Source code",
       "fileCount": 2,
-      "lastAccessed": 1775199566838,
+      "lastAccessed": 1775543262655,
       "keyFiles": [
         "NativeHandelNativeEvent.ts",
         "index.tsx"
@@ -124,14 +127,14 @@
       "path": "android/src",
       "purpose": "Source code",
       "fileCount": 0,
-      "lastAccessed": 1775199566839,
+      "lastAccessed": 1775543262656,
       "keyFiles": []
     },
     "src/__tests__": {
       "path": "src/__tests__",
       "purpose": "Test files",
       "fileCount": 1,
-      "lastAccessed": 1775199566840,
+      "lastAccessed": 1775543262656,
       "keyFiles": [
         "index.test.tsx"
       ]
@@ -140,44 +143,44 @@
   "hotPaths": [
     {
       "path": "",
-      "accessCount": 27,
-      "lastAccessed": 1775202983905,
+      "accessCount": 28,
+      "lastAccessed": 1775543590310,
       "type": "directory"
     },
     {
-      "path": "ios/HandelNativeEvent.mm",
-      "accessCount": 8,
-      "lastAccessed": 1775202992683,
+      "path": "android/src/main/java/com/handelnativeevent/HandelNativeEventModule.kt",
+      "accessCount": 11,
+      "lastAccessed": 1775543688428,
       "type": "file"
     },
     {
-      "path": "android/src/main/java/com/handelnativeevent/HandelNativeEventModule.kt",
-      "accessCount": 8,
-      "lastAccessed": 1775202992806,
+      "path": "ios/HandelNativeEvent.mm",
+      "accessCount": 10,
+      "lastAccessed": 1775543696418,
       "type": "file"
     },
     {
       "path": "src/index.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1775543670631,
+      "type": "file"
+    },
+    {
+      "path": "src/NativeHandelNativeEvent.ts",
+      "accessCount": 8,
+      "lastAccessed": 1775543649927,
+      "type": "file"
+    },
+    {
+      "path": "ios/HandelNativeEvent.h",
       "accessCount": 7,
-      "lastAccessed": 1775202724190,
+      "lastAccessed": 1775543601424,
       "type": "file"
     },
     {
       "path": "src/__tests__/index.test.tsx",
       "accessCount": 6,
       "lastAccessed": 1775202724033,
-      "type": "file"
-    },
-    {
-      "path": "src/NativeHandelNativeEvent.ts",
-      "accessCount": 6,
-      "lastAccessed": 1775202979984,
-      "type": "file"
-    },
-    {
-      "path": "ios/HandelNativeEvent.h",
-      "accessCount": 6,
-      "lastAccessed": 1775202992324,
       "type": "file"
     },
     {
