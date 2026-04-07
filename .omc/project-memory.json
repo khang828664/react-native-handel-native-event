@@ -149,8 +149,8 @@
     },
     {
       "path": "android/src/main/java/com/handelnativeevent/HandelNativeEventModule.kt",
-      "accessCount": 16,
-      "lastAccessed": 1775549547525,
+      "accessCount": 29,
+      "lastAccessed": 1775550297539,
       "type": "file"
     },
     {
@@ -193,6 +193,12 @@
       "path": "package.json",
       "accessCount": 5,
       "lastAccessed": 1775548972262,
+      "type": "file"
+    },
+    {
+      "path": "android/src/main/cpp/performance-boost.cpp",
+      "accessCount": 5,
+      "lastAccessed": 1775550318938,
       "type": "file"
     },
     {
@@ -254,12 +260,6 @@
       "accessCount": 1,
       "lastAccessed": 1775202988879,
       "type": "directory"
-    },
-    {
-      "path": "android/src/main/cpp/performance-boost.cpp",
-      "accessCount": 1,
-      "lastAccessed": 1775547936755,
-      "type": "file"
     },
     {
       "path": "android/src/main/cpp/CMakeLists.txt",

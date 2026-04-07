@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.os.Process
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
@@ -32,6 +33,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   )
 
   override fun syncUIRender(promise: Promise) {
+    Log.d(TAG, "syncUIRender: called")
     UiThreadUtil.runOnUiThread {
       try {
         val activity = currentActivity
@@ -40,6 +42,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
           return@runOnUiThread
         }
 
+        Log.d(TAG, "syncUIRender: activity found, setting up layout listener")
         val rootView = activity.window.decorView
         val handler = Handler(Looper.getMainLooper())
         val resolved = AtomicBoolean(false)
@@ -47,6 +50,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
         val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
           override fun onGlobalLayout() {
             if (resolved.compareAndSet(false, true)) {
+              Log.d(TAG, "syncUIRender: onGlobalLayout triggered, resolving")
               cleanup(rootView, this, handler)
               promise.resolve(true)
             }
@@ -55,6 +59,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
 
         val timeoutRunnable = Runnable {
           if (resolved.compareAndSet(false, true)) {
+            Log.d(TAG, "syncUIRender: timeout reached, resolving")
             cleanup(rootView, listener, handler)
             // Resolve with true - timeout means UI is likely stable
             promise.resolve(true)
@@ -92,6 +97,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   }
 
   override fun invalidate() {
+    Log.d(TAG, "invalidate: cleaning up ${pendingListeners.size} pending listeners")
     synchronized(pendingListeners) {
       pendingListeners.forEach { pending ->
         try {
@@ -107,6 +113,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   }
 
   override fun setSustainedPerformanceMode(enable: Boolean, promise: Promise) {
+    Log.d(TAG, "setSustainedPerformanceMode: enable=$enable")
     UiThreadUtil.runOnUiThread {
       try {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -128,6 +135,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   }
 
   override fun setKeepScreenOn(enable: Boolean, promise: Promise) {
+    Log.d(TAG, "setKeepScreenOn: enable=$enable")
     UiThreadUtil.runOnUiThread {
       try {
         val activity = currentActivity
@@ -148,12 +156,14 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   }
 
   override fun activateMaxPower(promise: Promise) {
+    Log.d(TAG, "activateMaxPower: called")
     try {
       // 1. Nâng thread priority lên mức cao nhất cho UI rendering
       Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY)
 
       // 2. Ghim thread vào Big cores (CPU Affinity qua JNI)
       val bigCores = detectBigCores()
+      Log.d(TAG, "activateMaxPower: bigCores=${bigCores.toList()}")
       nativeSetAffinity(bigCores)
 
       // 3. Window flags + Sustained Performance trên UI thread
@@ -183,6 +193,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
   }
 
   override fun deactivateMaxPower(promise: Promise) {
+    Log.d(TAG, "deactivateMaxPower: called")
     try {
       // 1. Khôi phục thread priority về mức mặc định
       Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT)
@@ -218,6 +229,7 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
    * Fallback về [0] nếu không đọc được (thiếu quyền hoặc không tồn tại).
    */
   private fun detectBigCores(): IntArray {
+    Log.d(TAG, "detectBigCores: scanning cores")
     val bigCores = mutableListOf<Int>()
     var maxFreq = 0L
     val coreCount = Runtime.getRuntime().availableProcessors()
@@ -234,12 +246,15 @@ class HandelNativeEventModule(reactContext: ReactApplicationContext) :
       } catch (_: Exception) { /* quyền bị từ chối hoặc file không tồn tại */ }
     }
 
-    return if (bigCores.isEmpty()) intArrayOf(0) else bigCores.toIntArray()
+    val result = if (bigCores.isEmpty()) intArrayOf(0) else bigCores.toIntArray()
+    Log.d(TAG, "detectBigCores: result=${result.toList()}, maxFreq=$maxFreq")
+    return result
   }
 
   companion object {
     const val NAME = NativeHandelNativeEventSpec.NAME
     private const val TIMEOUT_MS = 5000L
+    private const val TAG = "HandelNativeEvent"
 
     init {
       System.loadLibrary("performance-boost")
